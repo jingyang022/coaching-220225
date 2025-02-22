@@ -5,7 +5,6 @@ module "ecs" {
   cluster_name = "multiservice"
 
 
-
   fargate_capacity_providers = {
     FARGATE = {
       default_capacity_provider_strategy = {
@@ -14,16 +13,15 @@ module "ecs" {
     }
   }
 
-
-
   services = {
     s3-service = {
     cpu    = 512
       memory = 1024
+
       container_definitions = {
         s3-service = { #container name -> Change
           essential = true
-          image     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.prefix}-ecr:latest"
+          image     = "arn:aws:ecr:ap-southeast-1:255945442255:repository/wx-sqs"
           port_mappings = [
             {
               containerPort = 8080
@@ -31,12 +29,17 @@ module "ecs" {
             }
           ]
         }
+       sqs-service = { #container name -> Change
+          essential = false
+          image     = "arn:aws:ecr:ap-southeast-1:255945442255:repository/wx-s3"
+          port_mappings = [
+            {
+              containerPort = 8080
+              protocol      = "tcp"
+            }
+          ]
+        }
+      } 
     }
-    }
-
-    sqs-service = {
-     
-    }
-
   }
 }
